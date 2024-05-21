@@ -1,30 +1,36 @@
 package web.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import web.DAO.CarDao;
 import web.models.Car;
+import web.service.CarService;
+//import web.service.CarService;
 
 import java.util.List;
 
 @Controller
-@RequestMapping("/cars")
+@RequestMapping(value = "/cars")
 public class CarsController {
+    private final CarService carService;
 
-    private final CarDao carDao;
-    @Autowired
-    public CarsController(CarDao carDao) {
-        this.carDao = carDao;
+    public CarsController(CarService carService) {
+        this.carService = carService;
     }
 
     @GetMapping()
-    public String anyCar(@RequestParam(defaultValue = "5") int count, Model model) {
-        List<Car> test = carDao.carByCount(count);
-        model.addAttribute("car", test);
+    public String anyCar(@RequestParam(value = "count", required = false) Integer count, Model model) {
+        if (count != null) {
+            List<Car> list = carService.carByCount(count);
+            model.addAttribute("car", list);
+        } else {
+            List<Car> list = carService.carList();
+            model.addAttribute("car", list);
+        }
         return "carsCount";
     }
+
+
 }
